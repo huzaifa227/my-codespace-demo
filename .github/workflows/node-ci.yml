@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:            # Run on every push
-    branches: [main]
+    branches: [master]
   pull_request:    # Run on PRs
-    branches: [main]
+    branches: [master]
 
 jobs:
   build:
