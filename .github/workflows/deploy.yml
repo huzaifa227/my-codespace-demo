@@ -19,11 +19,11 @@ jobs:
 
       - name: Copy project files to server
         run: |
-          rsync -avz --exclude='.git' --exclude='node_modules' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.APP_PATH }}
+          rsync -avz -e "ssh -p 22345" --exclude='.git' --exclude='node_modules' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.APP_PATH }}
 
       - name: Install dependencies & restart app
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -p 22345 ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             cd ${{ secrets.APP_PATH }}
             npm install --production
             pm2 start app.js --name "my-node-app" || pm2 restart "my-node-app"
