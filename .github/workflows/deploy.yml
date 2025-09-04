@@ -17,6 +17,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p 22345 -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+      
       - name: Copy project files to server
         run: |
           rsync -avz -e "ssh -p 22345" --exclude='.git' --exclude='node_modules' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.APP_PATH }}
