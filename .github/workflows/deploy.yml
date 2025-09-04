@@ -1,0 +1,32 @@
+name: Deploy Node.js App
+
+on:
+  push:
+    branches: [ "master" ]   # Change branch if needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Copy project files to server
+        run: |
+          rsync -avz --exclude='.git' --exclude='node_modules' ./ ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.APP_PATH }}
+
+      - name: Install dependencies & restart app
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd ${{ secrets.APP_PATH }}
+            npm install --production
+            pm2 start app.js --name "my-node-app" || pm2 restart "my-node-app"
+            pm2 save
+          EOF
+
